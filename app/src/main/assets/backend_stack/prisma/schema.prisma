@@ -1,0 +1,202 @@
+// Kallesh AI Hub — Production PostgreSQL + Prisma Schema
+// Database: PostgreSQL
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String         @id @default(uuid())
+  email                String         @unique
+  passwordHash         String
+  passwordSalt         String
+  displayName          String
+  avatarUrl            String?
+  plan                 String         @default("FREE")
+  role                 String         @default("USER")
+  hasSeenFounderIntro  Boolean        @default(false)
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  sessions             Session[]
+  conversations        Conversation[]
+  messages             Message[]
+  toolUsages           AiToolUsage[]
+  uploadedFiles        UploadedFile[]
+  settings             UserSetting?
+  savedResults         SavedResult[]
+  apiUsages            ApiUsage[]
+
+  @@index([email])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  tokenHash    String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Conversation {
+  id                 String    @id @default(uuid())
+  userId             String
+  title              String
+  modelId            String    @default("gemini-3-flash-preview")
+  folder             String    @default("General")
+  isPinned           Boolean   @default(false)
+  isShared           Boolean   @default(false)
+  shareId            String?   @unique
+  lastMessagePreview String    @default("")
+  messageCount       Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages           Message[]
+
+  @@index([userId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  userId         String
+  role           String       // "user" | "model"
+  content        String       @db.Text
+  modelId        String
+  feedback       String       @default("NONE")
+  citationsJson  String       @default("[]") @db.Text
+  attachmentName String       @default("")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([userId])
+}
+
+model AiToolUsage {
+  id               String   @id @default(uuid())
+  userId           String
+  toolId           String
+  toolName         String
+  category         String
+  providerUsed     String
+  modelUsed        String
+  promptInput      String   @db.Text
+  resultOutput     String   @db.Text
+  mediaPathOrUrl   String   @default("")
+  status           String   @default("COMPLETED")
+  responseTimeMs   Int      @default(0)
+  estimatedTokens  Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, toolId, createdAt])
+}
+
+model UploadedFile {
+  id             String   @id @default(uuid())
+  userId         String
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  storagePath    String
+  extractedText  String   @default("") @db.Text
+  checksumSha256 String   @default("")
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model UserSetting {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  preferredLanguage String   @default("English")
+  responseStyle     String   @default("Professional")
+  defaultModel      String   @default("gemini-3-flash-preview")
+  themeMode         String   @default("DARK")
+  voiceEnabled      Boolean  @default(true)
+  memoryEnabled     Boolean  @default(true)
+  memorySummary     String   @default("") @db.Text
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SavedResult {
+  id          String   @id @default(uuid())
+  userId      String
+  toolId      String
+  type        String
+  title       String
+  prompt      String   @db.Text
+  content     String   @db.Text
+  mediaData   String   @default("") @db.Text
+  aspectRatio String   @default("1:1")
+  category    String   @default("General")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model ApiUsage {
+  id              String   @id @default(uuid())
+  userId          String
+  endpoint        String
+  httpMethod      String
+  provider        String
+  modelId         String
+  statusCode      Int
+  latencyMs       Int
+  tokensUsed      Int      @default(0)
+  usedFallback    Boolean  @default(false)
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([endpoint])
+}
+
+model ToolConfiguration {
+  toolId             String   @id
+  name               String
+  category           String
+  version            String   @default("2.4.0")
+  status             String   @default("ACTIVE")
+  primaryProvider    String   @default("GOOGLE_GEMINI")
+  primaryModelId     String   @default("gemini-3-flash-preview")
+  fallbackProvider   String   @default("OPENAI_COMPATIBLE")
+  fallbackModelId    String   @default("gemini-2.5-flash")
+  systemInstruction  String   @db.Text
+  dailyLimitFree     Int      @default(20)
+  dailyLimitPro      Int      @default(100)
+  dailyLimitPremium  Int      @default(500)
+  rolloutPercentage  Int      @default(100)
+  updatedAt          DateTime @updatedAt
+}

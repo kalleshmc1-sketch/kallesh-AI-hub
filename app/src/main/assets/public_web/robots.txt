@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /pricing
+Allow: /about
+Allow: /contact
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /chat
+Allow: /image-generator
+Allow: /video-generator
+
+# Do NOT expose private user pages, private chats, account pages, admin pages, or private data
+Disallow: /api/
+Disallow: /app/
+Disallow: /dashboard/
+Disallow: /conversations/
+Disallow: /history/
+Disallow: /workspace/
+Disallow: /profile/
+Disallow: /account/
+Disallow: /settings/
+Disallow: /admin/
+Disallow: /payment/
+
+Sitemap: https://kalleshaihub.com/sitemap.xml

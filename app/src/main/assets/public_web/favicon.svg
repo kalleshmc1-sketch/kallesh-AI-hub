@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="kalleshGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#0A1024" />
+  <path d="M36 28 H54 V58 L82 28 H102 L68 62 L104 100 H82 L54 68 V100 H36 Z" fill="url(#kalleshGrad)" />
+</svg>

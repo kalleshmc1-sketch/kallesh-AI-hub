@@ -1,0 +1,6 @@
+{
+  "name": "Kallesh AI Hub",
+  "description": "Kallesh AI Hub is an AI platform for AI chat, image generation, video generation and other AI-powered tools.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

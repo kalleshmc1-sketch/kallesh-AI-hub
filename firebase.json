@@ -1,0 +1,77 @@
+{
+  "firestore": {
+    "database": "ai-studio-android-c0253faa-d86a-4adf-b2c6-644a5bedfda8",
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "app/src/main/assets/public_web",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=63072000; includeSubDomains; preload"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "SAMEORIGIN"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/features",
+        "destination": "/features.html"
+      },
+      {
+        "source": "/pricing",
+        "destination": "/pricing.html"
+      },
+      {
+        "source": "/about",
+        "destination": "/about.html"
+      },
+      {
+        "source": "/contact",
+        "destination": "/contact.html"
+      },
+      {
+        "source": "/privacy-policy",
+        "destination": "/privacy-policy.html"
+      },
+      {
+        "source": "/terms-of-service",
+        "destination": "/terms-of-service.html"
+      },
+      {
+        "source": "/chat",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/image-generator",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/video-generator",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
